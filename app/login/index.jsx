@@ -1,15 +1,19 @@
-import { View, Text,Image } from 'react-native';
+import { View, Text,Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import Colors from '../../constants/Colors';
+import { useRouter } from 'expo-router';
 
 export default function loginScreen() {
+
+  const router = useRouter();
+
   return (
     <View>
       <View style={{
         display: 'flex',
         alignItems: 'center',
-        marginTop: 40,
+        marginTop: 30,
       }}>
         <Image source={require('./../../assets/images/login.png')}
         style={styles?.image} />
@@ -17,7 +21,7 @@ export default function loginScreen() {
       <View style={{
         padding:25,
         backgroundColor: Colors.PRIMARY,
-        height:'100%'
+        height:'100%',
       }}>
         <Text style={{
           fontSize:30,
@@ -36,6 +40,21 @@ export default function loginScreen() {
         }}>
           Track your meds, take control of your health, Stay constient,Stay confident
         </Text>
+
+        <TouchableOpacity style={styles?.button}
+        onPress={()=> router.push("login/signin")}>
+          <Text style={
+            {
+              color:Colors.PRIMARY,
+              textAlign:'center',
+              fontSize:16,
+              fontWeight:'bold',}
+          }>Continue</Text>
+        </TouchableOpacity>
+
+        <Text style={{color:'white',textAlign:'center',marginTop:10}}>
+          Note: By clicking the Continue button you agree to our terms and conditions
+        </Text>
       </View>
     </View>
   );
@@ -46,5 +65,11 @@ const styles = StyleSheet.create({
     width: 210,
     height: 450,
     borderRadius: 20,
+  },
+  button:{
+    padding:15,
+    backgroundColor:'white',
+    borderRadius: 99,
+    marginTop: 20,
   }
 })
