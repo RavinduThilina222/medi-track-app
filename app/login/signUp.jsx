@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
-import React from 'react';
+import React,{useState} from 'react';
 import Colors from '../../constants/Colors';
 import { useRouter } from 'expo-router';
 import { auth } from '../../firebaseConfig';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { setLocalStorage } from '../../service/Storage';
 
 export default function SignUp() {
 
@@ -11,18 +12,28 @@ export default function SignUp() {
 
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+    const [userName, setUserName] = useState('');
+    
 
     const OnCreateAccount = () => {
-        if (email === '' || password === '') {
+        if (email === '' || password === ''|| userName ===
+            '') {
             ToastAndroid.show('Please fill all fields', ToastAndroid.BOTTOM);
             Alert.alert('Please fill all fields');
             return;
         }
         createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
+            .then(async(userCredential) => {
                 // Signed up 
                 const user = userCredential.user;
                 console.log(user);
+                
+                await updateProfile(user,{
+                    displayName: userName
+                })
+
+                await setLocalStorage('userDetail', user);
+                
                 router.push('(tabs)');
                 // ...
             })
@@ -48,7 +59,8 @@ export default function SignUp() {
 
             <View style={{ marginTop: 25 }}>
                 <Text>Full Name</Text>
-                <TextInput placeholder='Full Name' style={styles.textInput} />
+                <TextInput placeholder='Full Name' style={styles.textInput} 
+                onChangeText={(value)=> setUserName(value)}/>
             </View>
 
             <View style={{ marginTop: 25 }}>
