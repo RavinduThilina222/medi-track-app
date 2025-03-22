@@ -9,12 +9,18 @@ import { formatDate,formatDateForText,formatTime } from '../service/ConvertDateT
 import { setDoc,doc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import {getLocalStorage} from '../service/Storage';
+import { useRouter } from 'expo-router';
+import { ActivityIndicator } from 'react-native';
 
 export default function AddMedicationForm() {
     const [formData,setFormData] = useState();
     const [showStartDate, setShowStartDate] = useState(false);
     const [showEndDate, setShowEndDate] = useState(false);
     const [showReminderTime, setShowReminderTime] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const router = useRouter();
+
     const onHandleInputChange = (field,value) => {
         setFormData(prev=> ({
             ...prev,
@@ -23,8 +29,10 @@ export default function AddMedicationForm() {
         console.log(formData)
     } 
 
-    const onHandleSubmit = async () => {
+    const saveMedication = async () => {
+        console.log('saveMedication function called'); // Debug log
         const docId = Date.now().toString();
+        console.log('Generated docId:', docId); // Debug log
         let user;
     
         try {
@@ -40,30 +48,42 @@ export default function AddMedicationForm() {
             return;
         }
     
-        // Validate user and email
         if (!user || !user.email) {
             console.error('User object is invalid:', user);
             Alert.alert('Error', 'User is not logged in or email is missing.');
             return;
         }
     
-        // Validate form fields
+        console.log('Validating form data:', formData); // Debug log
         if (!(formData?.name && formData?.type && formData?.does && formData?.when && formData?.startDate && formData?.endDate && formData?.reminder)) {
             Alert.alert('All fields are required');
             return;
         }
     
+        setLoading(true);
+        console.log('Saving medication to Firestore...'); // Debug log
+    
         try {
-            // Save medication data to Firestore
             await setDoc(doc(db, 'medications', docId), {
                 ...formData,
-                userEmail: user.email, // Ensure email is valid
+                userEmail: user.email,
                 docId: docId,
             });
-            Alert.alert('Medication Added Successfully');
+            console.log('Medication saved successfully'); // Debug log
+    
+            setLoading(false);
+            Alert.alert('Great!', 'New Medication Added Successfully', [
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        router.push('/(tabs)');
+                    },
+                },
+            ]);
         } catch (error) {
-            Alert.alert('Error Adding Medication', error.message);
+            setLoading(false);
             console.error('Error adding medication:', error);
+            Alert.alert('Error Adding Medication', error.message);
         }
     };
 
@@ -173,8 +193,12 @@ export default function AddMedicationForm() {
         />}
 
         <TouchableOpacity style={styles.button} 
-        onPress={onHandleSubmit}>
-            <Text style={styles.buttonText}>Add New Medicine</Text>
+        onPress={() => {
+            console.log('Button pressed'); // Debug log
+            saveMedication();
+        }}>
+            {loading? <ActivityIndicator size={'large'} color={'white'} />:
+            <Text style={styles.buttonText}>Add New Medicine</Text>}
         </TouchableOpacity>
     </View>
   );
