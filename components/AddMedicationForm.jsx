@@ -5,7 +5,7 @@ import Colors from '../constants/Colors';
 import { TypeList, WhenToTake } from '../constants/Options';
 import { Picker } from '@react-native-picker/picker';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
-import { formatDate,formatDateForText,formatTime } from '../service/ConvertDateTime';
+import { formatDate,formatDateForText,formatTime,getDatesRange } from '../service/ConvertDateTime';
 import { setDoc,doc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import {getLocalStorage} from '../service/Storage';
@@ -60,6 +60,8 @@ export default function AddMedicationForm() {
             return;
         }
     
+        const dates = getDatesRange(formData.startDate, formData.endDate);
+        console.log('Generated dates:', dates); // Debug log
         setLoading(true);
         console.log('Saving medication to Firestore...'); // Debug log
     
@@ -68,6 +70,7 @@ export default function AddMedicationForm() {
                 ...formData,
                 userEmail: user.email,
                 docId: docId,
+                dates: dates,
             });
             console.log('Medication saved successfully'); // Debug log
     

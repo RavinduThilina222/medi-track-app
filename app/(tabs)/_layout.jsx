@@ -34,11 +34,11 @@ export default function _layout() {
             <FontAwesome name="home" size={24} color={color} />
           )
         }} />
-      <Tabs.Screen name='AddNew'
+      <Tabs.Screen name='History'
         options={{
-          tabBarLabel: 'Add',
+          tabBarLabel: 'History',
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="plus-square" size={24} color={color} />
+            <FontAwesome name="history" size={24} color={color} />
           )
         }} />
       <Tabs.Screen name='Profile'
